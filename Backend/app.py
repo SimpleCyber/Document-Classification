@@ -3,15 +3,26 @@ import numpy as np
 from keras.models import load_model
 from PIL import Image, ImageOps
 import io
+import os
 import uvicorn
+
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# Load the model
-model = load_model("modal/keras_Model.h5", compile=False)
+# Allow frontend requests
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Adjust to your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# Load the labels
-class_names = open("modal/labels.txt", "r").readlines()
+
+
+assert os.path.exists("modal/keras_Model.h5"), "Model file not found!"
+assert os.path.exists("modal/labels.txt"), "Labels file not found!"
 
 @app.get("/")
 async def root():
