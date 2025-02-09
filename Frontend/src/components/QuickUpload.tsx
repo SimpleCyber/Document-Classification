@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { Upload, FileUp, X, FileText } from "lucide-react";
+import { Upload, FileUp, X, FileText, Loader2 } from "lucide-react";
 
 interface Upload {
   id: string;
@@ -70,10 +70,10 @@ const FileUploadArea = ({ label, file, onFileSelect, onFileRemove }: FileUploadA
 export const QuickUpload = () => {
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<{ class: string; confidence: number } | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (result && file) {
-      // Store result in localStorage
       const newUpload: Upload = {
         id: Date.now().toString(),
         filename: file.name,
@@ -82,7 +82,6 @@ export const QuickUpload = () => {
         type: result.class,
         confidence: result.confidence * 100,
       };
-
       const previousUploads = JSON.parse(localStorage.getItem("uploadHistory") || "[]");
       localStorage.setItem("uploadHistory", JSON.stringify([newUpload, ...previousUploads]));
     }
@@ -90,7 +89,7 @@ export const QuickUpload = () => {
 
   const handleUpload = async () => {
     if (!file) return;
-
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -103,6 +102,8 @@ export const QuickUpload = () => {
     } catch (error) {
       console.error("Upload failed:", error);
       alert("Upload failed. Check the console for details.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -114,13 +115,13 @@ export const QuickUpload = () => {
       <button
         onClick={handleUpload}
         className={`w-full mt-6 py-2 px-4 rounded-lg flex items-center justify-center space-x-2 ${file ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-600 cursor-not-allowed"} transition-colors`}
-        disabled={!file}
+        disabled={!file || loading}
       >
-        <FileUp size={20} />
-        <span>Get Prediction</span>
+        {loading ? <Loader2 className="animate-spin" size={20} /> : <FileUp size={20} />}
+        <span>{loading ? "Processing..." : "Get Prediction"}</span>
       </button>
 
-      {result && (
+      {result && !loading && (
         <div className="mt-4 p-4 bg-gray-700 rounded-lg text-white">
           <p><strong>Type:</strong> {result.class}</p>
           <p><strong>Confidence:</strong> {(result.confidence * 100).toFixed(2)}%</p>
