@@ -6,6 +6,9 @@ import io
 import uvicorn
 import os
 from fastapi.middleware.cors import CORSMiddleware
+import tensorflow as tf
+
+tf.config.set_visible_devices([], "GPU")
 
 app = FastAPI()
 
@@ -18,13 +21,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-assert os.path.exists("./modal/keras_model.h5"), "Model file not found!"
-assert os.path.exists("./modal/labels.txt"), "Labels file not found!"
-
 model_path = os.path.join(os.path.dirname(__file__), "modal/keras_model.h5")
+labels_path = os.path.join(os.path.dirname(__file__), "modal/labels.txt")
 
 if not os.path.exists(model_path):
     raise FileNotFoundError(f"Model file not found at {model_path}")
+
+if not os.path.exists(labels_path):
+    raise FileNotFoundError(f"Labels file not found at {labels_path}")
+
 
 model = load_model(model_path, compile=False)
 
@@ -65,6 +70,10 @@ async def predict(file: UploadFile = File(...)):
     except Exception as e:
         return {"error": str(e)}
 
+import os
+
 if __name__ == "__main__":
-    print("Backend started successfully. Running on http://0.0.0.0:8000")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 8000))  # Default to 8000 if PORT is not set
+    print(f"Backend started successfully. Running on http://0.0.0.0:{port}")
+    uvicorn.run(app, host="0.0.0.0", port=port)
+
