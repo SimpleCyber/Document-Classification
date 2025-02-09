@@ -10,8 +10,7 @@ const Footer = lazy(() => import("../components/Footer"))
 
 function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-950 via-blue-900 to-navy-900 text-white">
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <div className="min-h-screen bg-gradient-to-b from-blue-950 via-navy-800 to-navy-800 text-white">      <ErrorBoundary FallbackComponent={ErrorFallback}>
         <Suspense fallback={<LoadingSpinner />}>
           <Hero />
           <Features />

@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+@import "tailwindcss/utilities";
+
+@layer utilities {
+  .bg-navy-900  {
+    background-color: #1a1f2f;
+  }
+  .bg-navy-800, .to-navy-800{
+    background-color: #1a2f3f;
+  }
+}
