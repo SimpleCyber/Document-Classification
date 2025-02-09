@@ -15,7 +15,7 @@ app = FastAPI()
 # Allow frontend requests
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "https://document-classification-8as0.onrender.com"],  # Adjust to your frontend URL
+    allow_origins=["*"],  # Adjust to your frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
