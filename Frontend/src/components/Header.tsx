@@ -7,6 +7,7 @@ import {
   Sun,
   User,
   X,
+  ChevronRight,
 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -24,30 +25,34 @@ export function Header({ isDarkMode, setIsDarkMode }: HeaderProps) {
     setIsMenuOpen(false);
   };
 
+  const navItems = ["Home", "Dashboard"];
+
   return (
-    <header className="fixed w-full top-0 z-50 backdrop-blur-lg bg-blue-950/80 border-b border-blue-800/50">
+    <header className="fixed w-full top-0 z-50 backdrop-blur-xl bg-gradient-to-r from-gray-900/90 to-gray-800/90 border-b border-gray-800/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
-              <FileSearch2 className="w-5 h-5 text-white" />
+          <Link to="/" className="flex items-center space-x-3 group">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center transform group-hover:scale-105 transition-all duration-200">
+              <FileSearch2 className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-blue-300">
+            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-blue-200 to-purple-400">
               Doc ClassiFy
             </span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            {["Home", "Dashboard", "Upload", "History"].map((item) => (
+          <nav className="hidden md:flex items-center space-x-8 ml-auto">
+            {navItems.map((item) => (
               <Link
                 key={item}
                 to={`${item === "Home" ? "/" : `/${item.toLowerCase()}`}`}
-                className="text-blue-100 hover:text-white transition-colors duration-200 relative group"
+                className="relative group py-2"
               >
-                {item}
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
+                <span className="text-gray-300 group-hover:text-white transition-colors duration-200">
+                  {item}
+                </span>
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
               </Link>
             ))}
           </nav>
@@ -56,13 +61,15 @@ export function Header({ isDarkMode, setIsDarkMode }: HeaderProps) {
           <div className="hidden md:flex items-center space-x-6">
             {/* Theme Toggle */}
             <button
-              onClick={() => setIsDarkMode(true)}
-              className="p-2 rounded-lg hover:bg-blue-800/50 transition-colors duration-200"
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-2 rounded-lg hover:bg-gray-800/50 transition-all duration-200 hover:scale-105"
+              aria-label="Toggle theme"
+              
             >
               {isDarkMode ? (
-                <Sun className="w-5 h-5 text-blue-100" />
+                <Sun className="w-5 h-5 text-yellow-400" />
               ) : (
-                <Moon className="w-5 h-5 text-blue-100" />
+                <Moon className="w-5 h-5 text-blue-400" />
               )}
             </button>
 
@@ -70,14 +77,16 @@ export function Header({ isDarkMode, setIsDarkMode }: HeaderProps) {
             <div className="relative">
               <button
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center"
+                className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 p-0.5 transform hover:scale-105 transition-all duration-200"
               >
-                <User className="w-5 h-5 text-white" />
+                <div className="w-full h-full rounded-lg bg-gray-900 flex items-center justify-center">
+                  <User className="w-5 h-5 text-white" />
+                </div>
               </button>
 
               {/* Profile Dropdown */}
               {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-lg bg-blue-900 border border-blue-800/50 shadow-lg py-1">
+                <div className="absolute right-0 mt-2 w-56 rounded-xl bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-800/50 shadow-lg overflow-hidden">
                   {[
                     { label: "Profile", icon: User },
                     { label: "Settings", icon: Settings },
@@ -86,10 +95,11 @@ export function Header({ isDarkMode, setIsDarkMode }: HeaderProps) {
                     <Link
                       key={label}
                       to={`/${label.toLowerCase()}`}
-                      className="flex items-center px-4 py-2 text-sm text-blue-100 hover:bg-blue-800/50"
+                      className="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 group"
                     >
-                      <Icon className="w-4 h-4 mr-2" />
+                      <Icon className="w-4 h-4 mr-3" />
                       {label}
+                      <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all" />
                     </Link>
                   ))}
                 </div>
@@ -100,12 +110,12 @@ export function Header({ isDarkMode, setIsDarkMode }: HeaderProps) {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-blue-800/50 transition-colors duration-200"
+            className="md:hidden p-2 rounded-lg hover:bg-gray-800/50 transition-all duration-200"
           >
             {isMenuOpen ? (
-              <X className="w-6 h-6 text-blue-100" />
+              <X className="w-6 h-6 text-gray-300" />
             ) : (
-              <Menu className="w-6 h-6 text-blue-100" />
+              <Menu className="w-6 h-6 text-gray-300" />
             )}
           </button>
         </div>
@@ -113,20 +123,21 @@ export function Header({ isDarkMode, setIsDarkMode }: HeaderProps) {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="z-50 md:hidden fixed inset-0 top-16 bg-blue-950 backdrop-blur-lg">
-          <nav className="px-4 py-6 space-y-6 bg-blue-950 min-h-screen">
-            {["Home", "Dashboard", "Upload", "History"].map((item) => (
+        <div className="md:hidden fixed inset-0 top-16 bg-gradient-to-b from-gray-900 to-gray-800 backdrop-blur-xl">
+          <nav className="px-4 py-6 space-y-1">
+            {navItems.map((item) => (
               <Link
                 key={item}
                 to={`${item === "Home" ? "/" : `/${item.toLowerCase()}`}`}
-                className="block text-lg text-blue-100 hover:text-white transition-colors duration-200"
+                className="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg group"
                 onClick={handleMenuClose}
               >
                 {item}
+                <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all" />
               </Link>
             ))}
-            <hr className="border-blue-800/50" />
-            <div className="space-y-6">
+            <hr className="border-gray-800/50 my-4" />
+            <div className="space-y-1">
               {[
                 { label: "Profile", icon: User },
                 { label: "Settings", icon: Settings },
@@ -135,11 +146,12 @@ export function Header({ isDarkMode, setIsDarkMode }: HeaderProps) {
                 <Link
                   key={label}
                   to={`/${label.toLowerCase()}`}
-                  className="flex items-center text-blue-100 hover:text-white"
+                  className="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg group"
                   onClick={handleMenuClose}
                 >
                   <Icon className="w-5 h-5 mr-3" />
                   {label}
+                  <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all" />
                 </Link>
               ))}
             </div>

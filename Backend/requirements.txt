@@ -1,0 +1,11 @@
+Flask
+Flask-Cors
+Flask-PyMongo
+pandas
+numpy
+cloudinary
+scikit-learn
+tensorflow
+openpyxl
+requests
+python-dotenv
