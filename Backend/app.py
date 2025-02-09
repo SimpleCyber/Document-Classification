@@ -21,8 +21,12 @@ app.add_middleware(
 assert os.path.exists("./modal/keras_model.h5"), "Model file not found!"
 assert os.path.exists("./modal/labels.txt"), "Labels file not found!"
 
-model = load_model("modal/keras_Model.h5", compile=False)
-print("✅ Model loaded successfully!")
+model_path = os.path.join(os.path.dirname(__file__), "modal/keras_model.h5")
+
+if not os.path.exists(model_path):
+    raise FileNotFoundError(f"Model file not found at {model_path}")
+
+model = load_model(model_path, compile=False)
 
 
 # Load the labels
