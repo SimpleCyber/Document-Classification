@@ -1,6 +1,7 @@
 fastapi
 uvicorn
-tensorflow
-keras
-pillow
 numpy
+pillow
+keras
+tensorflow
+google-generativeai

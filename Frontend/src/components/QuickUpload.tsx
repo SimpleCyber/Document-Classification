@@ -1,6 +1,15 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { Upload, FileUp, X, FileText } from "lucide-react";
+
+interface Upload {
+  id: string;
+  filename: string;
+  uploadDate: string;
+  status: "matched" | "unmatched" | "pending";
+  type?: string;
+  confidence?: number;
+}
 
 interface FileUploadAreaProps {
   label: string;
@@ -18,42 +27,25 @@ const FileUploadArea = ({ label, file, onFileSelect, onFileRemove }: FileUploadA
     setIsDragging(true);
   };
 
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
+  const handleDragLeave = () => setIsDragging(false);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile) {
-      onFileSelect(droppedFile);
-    }
-  };
-
-  const handleClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      onFileSelect(e.target.files[0]);
-    }
+    if (e.dataTransfer.files[0]) onFileSelect(e.dataTransfer.files[0]);
   };
 
   return (
     <div className="space-y-2">
       <h3 className="text-sm font-medium text-white">{label}</h3>
-      <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" />
+      <input type="file" ref={fileInputRef} onChange={(e) => e.target.files?.[0] && onFileSelect(e.target.files[0])} className="hidden" />
       {!file ? (
         <div
-          className={`border-2 border-dashed rounded-xl p-12 md:p-14 cursor-pointer 
-            ${isDragging ? "border-blue-500 bg-navy-700" : "border-gray-600"} 
-            transition-colors duration-200`}
+          className={`border-2 border-dashed rounded-xl p-12 cursor-pointer ${isDragging ? "border-blue-500 bg-navy-700" : "border-gray-600"} transition-colors`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          onClick={handleClick}
+          onClick={() => fileInputRef.current?.click()}
         >
           <div className="flex flex-col items-center text-center">
             <Upload className="text-gray-400 mb-2" size={24} />
@@ -76,38 +68,53 @@ const FileUploadArea = ({ label, file, onFileSelect, onFileRemove }: FileUploadA
 };
 
 export const QuickUpload = () => {
-  const [file1, setFile1] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<{ class: string; confidence: number } | null>(null);
 
-  const handleUpload = async () => {
-    if (!file1) return;
+  useEffect(() => {
+    if (result && file) {
+      // Store result in localStorage
+      const newUpload: Upload = {
+        id: Date.now().toString(),
+        filename: file.name,
+        uploadDate: new Date().toLocaleString(),
+        status: result.class === "matched" ? "matched" : "unmatched",
+        type: result.class,
+        confidence: result.confidence * 100,
+      };
 
-    const formData = new FormData();
-    formData.append("file", file1);
+      const previousUploads = JSON.parse(localStorage.getItem("uploadHistory") || "[]");
+      localStorage.setItem("uploadHistory", JSON.stringify([newUpload, ...previousUploads]));
+    }
+  }, [result]);
+
+  const handleUpload = async () => {
+    if (!file) return;
 
     try {
-      const response = await axios.post("http://localhost:8000/predict/", formData, {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/predict/`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
       setResult(response.data);
     } catch (error) {
       console.error("Upload failed:", error);
+      alert("Upload failed. Check the console for details.");
     }
   };
 
   return (
     <div className="bg-navy-800 rounded-xl p-6">
       <h2 className="text-xl font-semibold text-white mb-4">Quick Upload</h2>
-      <div className="space-y-4">
-        <FileUploadArea label="Upload Image" file={file1} onFileSelect={setFile1} onFileRemove={() => setFile1(null)} />
-      </div>
+      <FileUploadArea label="Upload Image" file={file} onFileSelect={setFile} onFileRemove={() => setFile(null)} />
 
       <button
         onClick={handleUpload}
-        className={`w-full mt-6 py-2 px-4 rounded-lg flex items-center justify-center space-x-2 
-          ${file1 ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-600 cursor-not-allowed"} 
-          transition-colors duration-200`}
-        disabled={!file1}
+        className={`w-full mt-6 py-2 px-4 rounded-lg flex items-center justify-center space-x-2 ${file ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-600 cursor-not-allowed"} transition-colors`}
+        disabled={!file}
       >
         <FileUp size={20} />
         <span>Get Prediction</span>
@@ -115,7 +122,7 @@ export const QuickUpload = () => {
 
       {result && (
         <div className="mt-4 p-4 bg-gray-700 rounded-lg text-white">
-          <p><strong>Class:</strong> {result.class}</p>
+          <p><strong>Type:</strong> {result.class}</p>
           <p><strong>Confidence:</strong> {(result.confidence * 100).toFixed(2)}%</p>
         </div>
       )}
