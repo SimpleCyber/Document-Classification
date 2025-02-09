@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import axios from "axios";
 import { Upload, FileUp, X, FileText } from "lucide-react";
 
 interface FileUploadAreaProps {
@@ -8,12 +9,7 @@ interface FileUploadAreaProps {
   onFileRemove: () => void;
 }
 
-const FileUploadArea = ({
-  label,
-  file,
-  onFileSelect,
-  onFileRemove,
-}: FileUploadAreaProps) => {
+const FileUploadArea = ({ label, file, onFileSelect, onFileRemove }: FileUploadAreaProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -48,19 +44,12 @@ const FileUploadArea = ({
   return (
     <div className="space-y-2">
       <h3 className="text-sm font-medium text-white">{label}</h3>
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileSelect}
-        className="hidden"
-      />
+      <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" />
       {!file ? (
         <div
-          className={`
-            border-2 border-dashed rounded-xl p-12 md:p-14 cursor-pointer
-            ${isDragging ? "border-blue-500 bg-navy-700" : "border-gray-600"}
-            transition-colors duration-200
-          `}
+          className={`border-2 border-dashed rounded-xl p-12 md:p-14 cursor-pointer 
+            ${isDragging ? "border-blue-500 bg-navy-700" : "border-gray-600"} 
+            transition-colors duration-200`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
@@ -68,9 +57,7 @@ const FileUploadArea = ({
         >
           <div className="flex flex-col items-center text-center">
             <Upload className="text-gray-400 mb-2" size={24} />
-            <p className="text-gray-400 text-sm">
-              Drag and drop or click to select
-            </p>
+            <p className="text-gray-400 text-sm">Drag and drop or click to select</p>
           </div>
         </div>
       ) : (
@@ -79,13 +66,7 @@ const FileUploadArea = ({
             <FileText size={16} className="text-gray-400" />
             <span className="text-sm text-white">{file.name}</span>
           </div>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onFileRemove();
-            }}
-            className="p-1 hover:bg-navy-600 rounded-full transition-colors"
-          >
+          <button onClick={(e) => { e.stopPropagation(); onFileRemove(); }} className="p-1 hover:bg-navy-600 rounded-full transition-colors">
             <X size={16} className="text-gray-400 hover:text-white" />
           </button>
         </div>
@@ -96,35 +77,48 @@ const FileUploadArea = ({
 
 export const QuickUpload = () => {
   const [file1, setFile1] = useState<File | null>(null);
+  const [result, setResult] = useState<{ class: string; confidence: number } | null>(null);
+
+  const handleUpload = async () => {
+    if (!file1) return;
+
+    const formData = new FormData();
+    formData.append("file", file1);
+
+    try {
+      const response = await axios.post("http://0.0.0.0:8000/predict/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setResult(response.data);
+    } catch (error) {
+      console.error("Upload failed:", error);
+    }
+  };
 
   return (
     <div className="bg-navy-800 rounded-xl p-6">
       <h2 className="text-xl font-semibold text-white mb-4">Quick Upload</h2>
       <div className="space-y-4">
-        <FileUploadArea
-          label="Upload Documents"
-          file={file1}
-          onFileSelect={(file) => setFile1(file)}
-          onFileRemove={() => setFile1(null)}
-        />
+        <FileUploadArea label="Upload Image" file={file1} onFileSelect={setFile1} onFileRemove={() => setFile1(null)} />
       </div>
 
       <button
-        className={`
-          w-full mt-6 py-2 px-4 rounded-lg
-          flex items-center justify-center space-x-2
-          ${
-            file1
-              ? "bg-blue-500 hover:bg-blue-600"
-              : "bg-gray-600 cursor-not-allowed"
-          }
-          transition-colors duration-200
-        `}
+        onClick={handleUpload}
+        className={`w-full mt-6 py-2 px-4 rounded-lg flex items-center justify-center space-x-2 
+          ${file1 ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-600 cursor-not-allowed"} 
+          transition-colors duration-200`}
         disabled={!file1}
       >
         <FileUp size={20} />
-        <span>Get Report</span>
+        <span>Get Prediction</span>
       </button>
+
+      {result && (
+        <div className="mt-4 p-4 bg-gray-700 rounded-lg text-white">
+          <p><strong>Class:</strong> {result.class}</p>
+          <p><strong>Confidence:</strong> {(result.confidence * 100).toFixed(2)}%</p>
+        </div>
+      )}
     </div>
   );
 };

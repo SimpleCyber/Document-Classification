@@ -58,13 +58,12 @@ export function Header({ isDarkMode, setIsDarkMode }: HeaderProps) {
           </nav>
 
           {/* Right Section */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden md:flex items-center space-x-6 ">
             {/* Theme Toggle */}
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
               className="p-2 rounded-lg hover:bg-gray-800/50 transition-all duration-200 hover:scale-105"
               aria-label="Toggle theme"
-              
             >
               {isDarkMode ? (
                 <Sun className="w-5 h-5 text-yellow-400" />
