@@ -3,6 +3,6 @@ uvicorn
 numpy
 pillow
 keras
-tensorflow
+tensorflow==2.15.0
 google-generativeai
 gunicorn
