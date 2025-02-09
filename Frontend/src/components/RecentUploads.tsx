@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { CheckCircle, Clock, Eye, FileText, Calendar, File, PercentCircle, Trash2, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 interface Upload {
   id: string;
@@ -24,7 +23,6 @@ const StatusIcon = ({ status }: { status: Upload["status"] }) => {
 };
 
 export const RecentUploads = () => {
-  const navigate = useNavigate();
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [selectedUpload, setSelectedUpload] = useState<Upload | null>(null);
 
