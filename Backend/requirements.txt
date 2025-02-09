@@ -3,5 +3,5 @@ uvicorn
 numpy
 pillow
 keras
-tensorflow
 google-generativeai
+gunicorn
