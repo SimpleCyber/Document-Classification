@@ -1,5 +1,5 @@
 import {
-  FileCheck,
+  FileSearch2,
   LogOut,
   Menu,
   Moon,
@@ -31,7 +31,7 @@ export function Header({ isDarkMode, setIsDarkMode }: HeaderProps) {
           {/* Logo */}
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
-              <FileCheck className="w-5 h-5 text-white" />
+              <FileSearch2 className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-blue-300">
               Doc ClassiFy
