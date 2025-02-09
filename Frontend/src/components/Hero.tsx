@@ -79,7 +79,7 @@ const Hero = () => {
             </button>
           </Link>
           <Link
-            to="/demo"
+            to="https://youtu.be/MuH4j1OnxFc"
             className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
           >
             Watch Demo <ArrowRight className="w-4 h-4" />
