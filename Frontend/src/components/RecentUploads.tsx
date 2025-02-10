@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CheckCircle, Clock, Eye, FileText, Calendar, File, PercentCircle, Trash2, X } from "lucide-react";
+import { CheckCircle, Clock, Eye, FileText, Calendar, File, PercentCircle, Trash2, X, MessageSquare } from "lucide-react";
 
 interface Upload {
   id: string;
@@ -9,6 +9,7 @@ interface Upload {
   type?: string;
   confidence?: number;
   imageUrl?: string;
+  description?: string;
 }
 
 const StatusIcon = ({ status }: { status: Upload["status"] }) => {
@@ -19,6 +20,40 @@ const StatusIcon = ({ status }: { status: Upload["status"] }) => {
       return <CheckCircle className="text-green-500" size={20} />;
     case "unmatched":
       return <CheckCircle className="text-green-500" size={20} />;
+  }
+};
+
+const ParsedDescription = ({ description }: { description: string }) => {
+  try {
+    // Remove any extra text before the first { and after the last }
+    const jsonStr = description.substring(
+      description.indexOf("{"),
+      description.lastIndexOf("}") + 1
+    );
+    const parsedData = JSON.parse(jsonStr);
+
+    return (
+      <div className="space-y-3">
+        {Object.entries(parsedData).map(([key, value]) => (
+          <div key={key} className="space-y-1">
+            <h4 className="text-sm font-medium text-gray-300 capitalize">
+              {key.replace(/_/g, " ")}:
+            </h4>
+            <p className="text-white bg-navy-600 p-2 rounded-lg text-sm">
+              {String(value)}
+            </p>
+          </div>
+        ))}
+      </div>
+    );
+  } catch (error) {
+    console.log(error)
+    // Fallback to raw text if parsing fails
+    return (
+      <div className="bg-navy-800 p-3 rounded-lg text-gray-300 whitespace-pre-wrap">
+        {description}
+      </div>
+    );
   }
 };
 
@@ -84,79 +119,79 @@ export const RecentUploads = () => {
       )}
 
       {/* Modal Popup */}
-      {/* Modal Popup */}
-{selectedUpload && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center">
-    <div 
-      className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
-      onClick={() => setSelectedUpload(null)}
-    />
-    
-    <div className="bg-navy-700 rounded-xl shadow-xl w-80 relative z-10">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-navy-600">
-        <h3 className="text-lg font-semibold text-white">Upload Details</h3>
-        <button 
-          className="p-2 hover:bg-navy-600 rounded-full transition-colors"
-          onClick={() => setSelectedUpload(null)}
-        >
-          <X className="text-gray-400 hover:text-white" size={18} />
-        </button>
-      </div>
-
-      {/* Content */}
-      <div className="p-4 space-y-4">
-        {/* <div className="aspect-video w-full overflow-hidden rounded-lg bg-navy-800">
-          <img 
-            src={selectedUpload.imageUrl || "https://flixier.com/ai/ai-image-generator/random-image-generator"} 
-            alt={selectedUpload.filename} 
-            className="w-full h-full object-cover"
+      {selectedUpload && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
+            onClick={() => setSelectedUpload(null)}
           />
-        </div> */}
+          
+          <div className="bg-navy-700 rounded-xl shadow-xl w-[500px] max-h-[80vh] overflow-y-auto relative z-10">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-navy-600">
+              <h3 className="text-lg font-semibold text-white">Upload Details</h3>
+              <button 
+                className="p-2 hover:bg-navy-600 rounded-full transition-colors"
+                onClick={() => setSelectedUpload(null)}
+              >
+                <X className="text-gray-400 hover:text-white" size={18} />
+              </button>
+            </div>
 
-        <div className="space-y-3">
-          <div className="space-y-1">
-            <p className="text-white font-medium truncate">
-              {selectedUpload.filename}
-            </p>
-            <div className="flex items-center space-x-2 text-sm text-gray-400">
-              <StatusIcon status={selectedUpload.status} />
-              <span>{"Parsed Successfully"}</span>
-            </div>
-          </div>
+            {/* Content */}
+            <div className="p-4 space-y-4">
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <p className="text-white font-medium truncate">
+                    {selectedUpload.filename}
+                  </p>
+                  <div className="flex items-center space-x-2 text-sm text-gray-400">
+                    <StatusIcon status={selectedUpload.status} />
+                    <span>{"Parsed Successfully"}</span>
+                  </div>
+                </div>
 
-          <div className="space-y-2 text-sm text-gray-400">
-            <div className="flex items-center space-x-2">
-              <PercentCircle size={16} />
-              <span>Confidence: {selectedUpload.confidence ? `${selectedUpload.confidence.toFixed(2)}%` : "N/A"}</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Calendar size={16} />
-              <span>{selectedUpload.uploadDate}</span>
-            </div>
-            {selectedUpload.type && (
-              <div className="flex items-center space-x-2">
-                <File size={16} />
-                <span>Type : {selectedUpload.type}</span>
+                <div className="space-y-2 text-sm text-gray-400">
+                  <div className="flex items-center space-x-2">
+                    <PercentCircle size={16} />
+                    <span>Confidence: {selectedUpload.confidence ? `${selectedUpload.confidence.toFixed(2)}%` : "N/A"}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Calendar size={16} />
+                    <span>{selectedUpload.uploadDate}</span>
+                  </div>
+                  {selectedUpload.type && (
+                    <div className="flex items-center space-x-2">
+                      <File size={16} />
+                      <span>Type: {selectedUpload.type}</span>
+                    </div>
+                  )}
+                  {selectedUpload.description && (
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-center space-x-2 text-white mb-3">
+                        <MessageSquare size={16} />
+                        <span className="font-medium">Extracted Information</span>
+                      </div>
+                      <ParsedDescription description={selectedUpload.description} />
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-navy-600 flex justify-end">
+              <button 
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors flex items-center space-x-2"
+                onClick={() => handleDelete(selectedUpload.id)}
+              >
+                <Trash2 size={16} />
+                <span>Delete</span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-navy-600 flex justify-end">
-        <button 
-          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors flex items-center space-x-2"
-          onClick={() => handleDelete(selectedUpload.id)}
-        >
-          <Trash2 size={16} />
-          <span>Delete</span>
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      )}
     </div>
   );
 };

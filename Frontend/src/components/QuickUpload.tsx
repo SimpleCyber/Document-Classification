@@ -9,6 +9,7 @@ interface Upload {
   status: "matched" | "unmatched" | "pending";
   type?: string;
   confidence?: number;
+  description?: string;
 }
 
 interface FileUploadAreaProps {
@@ -67,9 +68,18 @@ const FileUploadArea = ({ label, file, onFileSelect, onFileRemove }: FileUploadA
   );
 };
 
+interface APIResponse {
+  class: string;
+  confidence: number;
+  description: {
+    response?: string;
+    error?: string;
+  };
+}
+
 export const QuickUpload = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [result, setResult] = useState<{ class: string; confidence: number } | null>(null);
+  const [result, setResult] = useState<APIResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -81,6 +91,7 @@ export const QuickUpload = () => {
         status: result.class === "matched" ? "matched" : "unmatched",
         type: result.class,
         confidence: result.confidence * 100,
+        description: result.description.response || result.description.error || "No description available",
       };
       const previousUploads = JSON.parse(localStorage.getItem("uploadHistory") || "[]");
       localStorage.setItem("uploadHistory", JSON.stringify([newUpload, ...previousUploads]));
@@ -125,6 +136,7 @@ export const QuickUpload = () => {
         <div className="mt-4 p-4 bg-gray-700 rounded-lg text-white">
           <p><strong>Type:</strong> {result.class}</p>
           <p><strong>Confidence:</strong> {(result.confidence * 100).toFixed(2)}%</p>
+          <p><strong>Description:</strong> {result.description.response || result.description.error || "No description available"}</p>
         </div>
       )}
     </div>
