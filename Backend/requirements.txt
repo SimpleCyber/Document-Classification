@@ -7,3 +7,4 @@ tensorflow==2.15.0
 google-generativeai
 gunicorn
 python-multipart
+python-dotenv
