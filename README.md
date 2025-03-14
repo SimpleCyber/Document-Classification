@@ -4,9 +4,9 @@ Here’s a structured summary of your project with key points and links:
 
 # **Doc ClassiFy – AI-Powered Document Classification & Extraction**  
 
-🔗 **[YouTube Demo](https://youtu.be/MuH4j1OnxFc)**  
-🔗 **[GitHub Repository](https://github.com/SimpleCyber/Document-Classification.git)**  
-🔗 **[Project Link Live](https://docclassify.vercel.app/)**  
+🔗 **[YouTube Demo](https://youtu.be/MuH4j1OnxFc)**   : https://youtu.be/MuH4j1OnxFc
+🔗 **[GitHub Repository](https://github.com/SimpleCyber/Document-Classification.git)**   : https://github.com/SimpleCyber/Document-Classification.git
+🔗 **[Project Link Live](https://docclassify.vercel.app/)**  : https://docclassify.vercel.app/
 
 
 ## **Overview**  
